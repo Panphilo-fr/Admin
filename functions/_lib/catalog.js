@@ -18,7 +18,7 @@ export function sameKey(a, b) {
   return d === 0;
 }
 
-const STR = ["nom", "court", "sousTitre", "memo", "first", "rule", "extDe"];
+const STR = ["nom", "court", "sousTitre", "but", "fin", "memo", "first", "rule", "extDe"];
 const NUM = ["pmin", "pmax", "dur", "age", "target", "teamN", "annee"];
 const BOOL = ["points", "rounds", "teamMode", "extension", "aVerifier"];
 const ARR = ["types", "setup", "editeurs", "auteurs"];

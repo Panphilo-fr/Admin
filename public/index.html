@@ -212,7 +212,9 @@ function renderEdit(){
    <div class="f"><span class="lab">Qui gagne ?</span><div class="seg"><button type="button" data-rule="high" aria-pressed="${e.points&&e.rule!=="low"}">Le plus de points</button><button type="button" data-rule="low" aria-pressed="${e.points&&e.rule==="low"}">Le moins de points</button><button type="button" data-rule="win" aria-pressed="${!e.points}">Juste le gagnant</button></div>${e.points?`<div class="f"><label for="target">Objectif de points (facultatif)</label><input id="target" type="number" inputmode="numeric" value="${v(e.target)}" placeholder="Ex. 200 pour Flip 7"></div>${sw("rounds","Par manches")}`:`<span class="hint">Pas de points à compter : pendant la partie, on touche simplement le gagnant (Codenames, Jungle Speed…).</span>`}</div>
    <div class="f">${sw("teamMode","En équipes")}${e.teamMode?`<div class="seg">${[2,3,4].map(n=>`<button type="button" data-tn="${n}" aria-pressed="${(e.teamN||2)===n}">${n} équipes</button>`).join("")}</div>`:""}</div>
    <div class="f"><label for="first">Qui commence</label><input id="first" value="${v(e.first)}" maxlength="200" placeholder="Ex. Le plus jeune"></div>
-   <div class="f"><label for="memo">Règles en bref</label><textarea id="memo" maxlength="2000" placeholder="L'essentiel pour jouer, en quelques phrases.">${v(e.memo)}</textarea></div>
+   <div class="f"><label for="but">But du jeu</label><input id="but" value="${v(e.but)}" maxlength="200" placeholder="Ex. Vider sa main le premier."></div>
+   <div class="f"><label for="fin">Fin de partie</label><input id="fin" value="${v(e.fin)}" maxlength="200" placeholder="Ex. Le premier à 500 points gagne."></div>
+   <div class="f"><label for="memo">À ne pas oublier</label><textarea id="memo" maxlength="2000" placeholder="Le détail qu'on oublie toujours (facultatif).">${v(e.memo)}</textarea></div>
    <div class="f"><label for="setup">Mise en place</label><textarea id="setup" placeholder="Une étape par ligne">${esc((e.setup||[]).join("\n"))}</textarea><span class="hint">Une étape par ligne. Elles deviennent une checklist dans l'appli.</span></div>
    ${sw("extension","C'est une extension")}
    ${sw("aVerifier","Fiche à vérifier")}
@@ -222,7 +224,7 @@ function renderEdit(){
   <div class="acts"><button class="btn pri" id="save" ${busy?"disabled":""}>${busy?"Publication…":edId?"Enregistrer":"Ajouter au catalogue"}</button>${edId&&e.aVerifier?`<button class="btn" id="saveok" ${busy?"disabled":""}>Valider la fiche</button>`:""}</div>`;
   const read=()=>{const g=id=>$("#"+id);const n=id=>{const x=g(id);if(!x)return ed[id];const t=x.value.trim();return t===""?null:Math.round(+t)};
     ed.nom=g("nom").value.trim();ed.court=g("court").value.trim()||null;["pmin","pmax","dur","age","target"].forEach(k=>ed[k]=n(k));
-    {const x=parseFloat(String(g("prix").value).replace(",","."));ed.prix=isNaN(x)||x<=0?null:Math.round(x*100)/100}ed.first=g("first").value.trim();ed.memo=g("memo").value.trim();ed.setup=g("setup").value.split("\n").map(s=>s.trim()).filter(Boolean)};
+    {const x=parseFloat(String(g("prix").value).replace(",","."));ed.prix=isNaN(x)||x<=0?null:Math.round(x*100)/100}ed.first=g("first").value.trim();ed.but=g("but").value.trim();ed.fin=g("fin").value.trim();ed.memo=g("memo").value.trim();ed.setup=g("setup").value.split("\n").map(s=>s.trim()).filter(Boolean)};
   $("#back").onclick=()=>{view="list";renderList()};
   document.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{read();ed[b.dataset.sw]=!ed[b.dataset.sw];renderEdit()});
   document.querySelectorAll("[data-ty]").forEach(b=>b.onclick=()=>{read();const t=b.dataset.ty,T=ed.types||[];ed.types=T.includes(t)?T.filter(x=>x!==t):T.concat(t);renderEdit()});
