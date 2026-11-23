@@ -1,0 +1,8 @@
+name = "admin"
+pages_build_output_dir = "public"
+compatibility_date = "2026-11-01"
+
+# Catalogue Atout : même espace KV que l'appli Atout (clé « catalog »).
+[[kv_namespaces]]
+binding = "CATALOG"
+id = "1a108dd2dc614360ba1604b04c042341"

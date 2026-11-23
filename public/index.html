@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0A0D0B">
+<title>Panphilo · Admin</title>
+<style>
+/* Console d'administration Panphilo : Limites, Tribu, Atout (catalogue). Une colonne. */
+:root{
+  --bg:#0A0D0B;--surface:#151716;--surface-2:#202321;--ink:#F2F3F1;--muted:#8E938F;--line:#2A2E2C;
+  --accent:#D4FF2A;--accent-ink:#0B0C0C;--warn:#FFB347;--danger:#FF5C7A;--ok:#2EFF8F;
+  --display:system-ui,-apple-system,"Segoe UI",sans-serif;--body:system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 60px}
+.wrap{max-width:680px;margin:0 auto}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:1.5rem}h2{font-size:1.25rem}
+h1 span{color:var(--accent)}
+.bar{display:flex;align-items:center;gap:12px;padding-block:18px 10px}
+.bar .sp{flex:1}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{border:none;border-radius:99px;min-height:44px;padding:0 18px;font-weight:700;background:var(--surface-2)}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn.dan{background:transparent;color:var(--danger);box-shadow:inset 0 0 0 1.5px var(--danger)}
+.btn:disabled{opacity:.5;cursor:default}
+.link{border:none;background:none;color:var(--muted);font-weight:700;padding:8px 4px;min-height:40px}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;min-width:0}
+textarea{min-height:110px;resize:vertical;line-height:1.45}
+.card{background:var(--surface);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.login{margin-top:12vh}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 14px;font-weight:600;font-size:.9rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tools{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-direction:column;gap:10px;padding-block:8px 12px;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.row{display:flex;gap:8px;align-items:center}
+.row>input{flex:1}
+.list{display:flex;flex-direction:column;margin-top:8px}
+.it{display:flex;align-items:center;gap:12px;border:none;background:none;text-align:left;padding:12px 4px;border-bottom:1px solid var(--line);width:100%}
+.it>span:first-child{flex:1;min-width:0;display:flex;flex-direction:column}
+.it b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it small{color:var(--muted);font-size:.82rem}
+.pill{flex:none;font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border-radius:99px;padding:3px 9px}
+.pill.v{color:var(--warn);box-shadow:inset 0 0 0 1px var(--warn)}
+.pill.ok{color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}
+.pill.e{color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.f{display:flex;flex-direction:column;gap:6px}
+.f>label,.lab{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.f .hint{font-size:.8rem;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:420px){.grid4{grid-template-columns:1fr 1fr}}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;border:none;background:var(--surface-2);border-radius:14px;padding:12px 14px;min-height:50px;text-align:left;font-weight:600;width:100%}
+.sw i{flex:none;width:44px;height:26px;border-radius:99px;background:var(--line);position:relative;transition:background .15s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ink);transition:transform .15s}
+.sw[aria-checked="true"] i{background:var(--accent)}
+.sw[aria-checked="true"] i::after{transform:translateX(18px);background:var(--accent-ink)}
+.acts{display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:var(--bg);padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.acts .btn.pri{flex:1}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font-weight:700;border-radius:99px;padding:10px 18px;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.err{color:var(--danger);font-weight:600;margin:0}
+.confirm{display:flex;flex-direction:column;gap:10px;background:var(--surface-2);border-radius:14px;padding:14px}
+.empty{color:var(--muted);text-align:center;padding:30px 0}
+.imp{gap:8px;margin:12px 0 4px;box-shadow:inset 0 0 0 1px rgba(212,255,42,.35)}
+.imp .btn{align-self:flex-start}
+.tabs{display:flex;gap:6px;margin:6px 0 14px}
+.tabs button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:99px;min-height:44px;font-weight:700}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.stat{background:var(--surface);border-radius:16px;padding:14px}
+.stat b{display:block;font:700 1.6rem/1.1 var(--display)}
+.stat span{font-size:.8rem;color:var(--muted)}
+.meter{display:flex;flex-direction:column;gap:6px}
+.meter .top{display:flex;justify-content:space-between;gap:10px;font-size:.92rem}
+.meter .top span:last-child{color:var(--muted);text-align:right}
+.meter .trk{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.meter .trk i{display:block;height:100%;border-radius:99px;background:var(--ok)}
+.meter.w .trk i{background:var(--warn)}.meter.d .trk i{background:var(--danger)}
+.sec{margin:18px 0 8px;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.todo{background:var(--surface-2);border-radius:14px;padding:12px 14px;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast" hidden role="status"></div>
+<script>
+const TYPES=["Ambiance","Cartes","Coopératif","Dés","Enquête","Famille","Stratégie","Placement","Bluff","Rapidité"];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>String(s??"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const slug=s=>norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"jeu";
+let key="";try{key=localStorage.getItem("atout-admin-key")||""}catch(e){}
+let tab="limites",stats={},base=null,cat=null,view="list",filt="v",q="",ed=null,edId=null,delArm=false,busy=false;
+try{filt=localStorage.getItem("atout-admin-f")||"v"}catch(e){}
+try{tab=localStorage.getItem("admin-tab")||"limites"}catch(e){}
+
+function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2600)}
+async function api(path,body){
+  const r=await fetch(path,body?{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify(body)}:{cache:"no-store"});
+  let d={};try{d=await r.json()}catch(e){}
+  if(!r.ok)throw Object.assign(new Error(d.error||("Erreur "+r.status)),{status:r.status});
+  return d;
+}
+
+function renderLogin(msg){
+  $("#app").innerHTML=`<div class="card login"><h1>Panphilo<span>.</span> Admin</h1><p class="muted">Limites, Tribu et catalogue Atout. Entre ta clé d'administration.</p>
+  <form id="lf" class="f"><label for="k">Clé</label><input id="k" type="password" autocomplete="current-password" value="${esc(key)}" required>${msg?`<p class="err">${esc(msg)}</p>`:""}<button class="btn pri" type="submit">Entrer</button></form></div>`;
+  $("#lf").onsubmit=async e=>{e.preventDefault();key=$("#k").value.trim();try{await api("/api/catalog/admin",{action:"check"});try{localStorage.setItem("atout-admin-key",key)}catch(e){}await load()}catch(err){renderLogin(err.message)}};
+}
+async function load(){
+  $("#app").innerHTML=`<p class="empty">Chargement du catalogue…</p>`;
+  try{cat=await api("/api/catalog");view="list";render()}catch(e){$("#app").innerHTML=`<p class="empty">Impossible de charger le catalogue : ${esc(e.message)}</p>`}
+}
+async function publish(jeux,okMsg){
+  busy=true;render();
+  try{const r=await api("/api/catalog/admin",{action:"save",baseVersion:cat.version,jeux});cat.jeux=jeux;cat.version=r.version;cat.updated=r.updated;busy=false;toast(okMsg);return true}
+  catch(e){busy=false;if(e.status===401){renderLogin("Ta clé n'est plus valide.");return false}toast(e.message);render();return false}
+}
+
+function render(){if(tab==="limites")return renderLimites();if(tab==="tribu")return renderTribu();view==="edit"?renderEdit():renderList()}
+function nav(){return `<div class="tabs" role="group" aria-label="Pages">${[["limites","Limites"],["tribu","Tribu"],["atout","Atout"]].map(t=>`<button data-tab="${t[0]}" aria-pressed="${tab===t[0]}">${t[1]}</button>`).join("")}</div>`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;tab=b.dataset.tab;try{localStorage.setItem("admin-tab",tab)}catch(x){}view="list";render()});
+const MO=1024*1024,GO=1024*MO;
+function fmtB(n){n=+n||0;return n>=GO?(n/GO).toFixed(2).replace(".",",")+" Go":n>=MO?(n/MO).toFixed(n>=10*MO?0:1).replace(".",",")+" Mo":Math.max(1,Math.round(n/1024))+" Ko"}
+function fmtN(n){return(+n||0).toLocaleString("fr-FR")}
+function meter(label,val,max,fmt,note){const p=max?Math.min(100,val/max*100):0;return `<div class="meter ${p>=90?"d":p>=70?"w":""}"><div class="top"><span>${label}</span><span>${fmt(val)} / ${fmt(max)}</span></div><div class="trk" role="progressbar" aria-valuenow="${Math.round(p)}" aria-valuemin="0" aria-valuemax="100" aria-label="${esc(label)}"><i style="width:${Math.max(p,val?1.5:0)}%"></i></div>${note?`<span class="muted small">${note}</span>`:""}</div>`}
+function ago(d){if(!d)return "jamais";const m=Math.round((Date.now()-new Date(d))/60000);if(m<2)return "à l'instant";if(m<60)return "il y a "+m+" min";const h=Math.round(m/60);if(h<24)return "il y a "+h+" h";const j=Math.round(h/24);return j===1?"hier":"il y a "+j+" jours"}
+function todo(r,what){return `<div class="todo"><b>À brancher</b><br>${what} Ajoute dans Cloudflare (projet Atout, Réglages, Variables et secrets) : <code>${esc(r.manque)}</code>.</div>`}
+function errBox(r,what){return r.erreur==="non_configure"?todo(r,what):`<div class="todo"><b>Indisponible</b><br>${esc(r.erreur)}</div>`}
+async function loadStats(part){
+  stats[part]=null;render();
+  try{const d=await api("/api/admin/stats",{part});stats[part]=d}catch(e){if(e.status===401){renderLogin("Ta clé n'est plus valide.");return}stats[part]={error:e.message}}
+  if((tab==="limites"&&part==="limites")||(tab==="tribu"&&part==="tribu"))render();
+}
+function head(t){return `<div class="bar"><h1>Panphilo<span>.</span> ${t}</h1><span class="sp"></span><button class="link" id="out">Déconnexion</button></div>${nav()}`}
+function bindOut(){const o=$("#out");if(o)o.onclick=()=>{key="";stats={};try{localStorage.removeItem("atout-admin-key")}catch(e){}renderLogin()}}
+function renderLimites(){
+  const d=stats.limites;
+  if(d===undefined){loadStats("limites");return}
+  if(d===null){$("#app").innerHTML=head("Limites")+`<p class="empty">Chargement des chiffres…</p>`;bindOut();return}
+  if(d.error){$("#app").innerHTML=head("Limites")+`<p class="empty">${esc(d.error)}</p><button class="btn" id="rf">Réessayer</button>`;bindOut();$("#rf").onclick=()=>loadStats("limites");return}
+  const L=d.limites,t=d.tribu,c=d.cloudflare;let h=head("Limites");
+  h+=`<p class="muted small" style="margin:0 0 4px">Offres gratuites : où tu en es sur Tribu et Atout.</p><div class="sec">Supabase · Tribu</div><div class="card">`;
+  h+=t.erreur?errBox(t,"Les chiffres de la base Tribu."):meter("Base de données",t.base_octets,L.supabase.base,fmtB,`Dont tes données : ${fmtB(t.donnees_octets)}. Le reste est le système de Supabase.`)+meter(`Photos (${t.photos_nombre})`,t.photos_octets,L.supabase.photos,fmtB)+`<span class="muted small">Trafic mensuel (environ 5 Go) : à relever dans Supabase, Usage.</span>`;
+  h+=`</div><div class="sec">Cloudflare · Atout et Tribu</div><div class="card">`;
+  if(c.erreur)h+=errBox(c,"Les compteurs d'utilisation Cloudflare.");
+  else{const f=c.fonctions,k=c.kv,b=c.builds,Lc=L.cloudflare;
+    h+=f.erreur?`<div class="todo">Fonctions : ${esc(f.erreur)}</div>`:meter("Fonctions serveur, aujourd'hui",f.aujourdhui,Lc.fonctions,fmtN,"Catalogue, mails, import de recettes. Remis à zéro à 1 h (minuit UTC).");
+    h+=k.erreur?`<div class="todo">Catalogue (KV) : ${esc(k.erreur)}</div>`:meter("Catalogue : lectures aujourd'hui",k.lectures,Lc.kvLectures,fmtN)+meter("Catalogue : écritures aujourd'hui",k.ecritures,Lc.kvEcritures,fmtN)+meter("Catalogue : stockage",k.octets,Lc.kvOctets,fmtB);
+    h+=b.erreur?`<div class="todo">Mises en ligne : ${esc(b.erreur)}</div>`:meter("Mises en ligne ce mois (Atout + Tribu)",(b.atout||0)+(b.tribu||0),Lc.builds,fmtN,`Atout ${b.atout||0} · Tribu ${b.tribu||0}`)}
+  h+=`</div><button class="btn" id="rf" style="margin-top:14px">Actualiser</button>`;
+  $("#app").innerHTML=h;bindOut();$("#rf").onclick=()=>loadStats("limites");
+}
+function renderTribu(){
+  const d=stats.tribu;
+  if(d===undefined){loadStats("tribu");return}
+  if(d===null){$("#app").innerHTML=head("Tribu")+`<p class="empty">Chargement…</p>`;bindOut();return}
+  if(d.error){$("#app").innerHTML=head("Tribu")+`<p class="empty">${esc(d.error)}</p><button class="btn" id="rf">Réessayer</button>`;bindOut();$("#rf").onclick=()=>loadStats("tribu");return}
+  const t=d.tribu;let h=head("Tribu");
+  if(t.erreur){h+=errBox(t,"Les chiffres de la base Tribu.")}
+  else{
+    h+=`<div class="grid4" style="grid-template-columns:1fr 1fr"><div class="stat"><b>${fmtN(t.tribus)}</b><span>Tribus</span></div><div class="stat"><b>${fmtN(t.comptes)}</b><span>Comptes</span></div><div class="stat"><b>${fmtN(t.membres)}</b><span>Membres</span></div><div class="stat"><b>${fmtN(t.notifications)}</b><span>Notifications actives</span></div></div>
+    <div class="sec">Tribus</div><div class="card" style="gap:0">${(t.liste||[]).map(x=>`<div class="it" style="cursor:default"><span><b>Tribu ${esc(x.id)}</b><small>Créée le ${new Date(x.creee).toLocaleDateString("fr-FR")} · ${x.membres} membre${x.membres>1?"s":""}, ${x.comptes} compte${x.comptes>1?"s":""}</small></span><span class="pill ${Date.now()-new Date(x.derniere_activite)<7*864e5?"ok":"e"}" style="text-transform:none;letter-spacing:0">${esc(ago(x.derniere_activite))}</span></div>`).join("")||'<p class="empty">Aucune tribu.</p>'}</div>
+    <p class="muted small">Seuls des chiffres sont affichés : jamais l'agenda, les photos ni les fiches des enfants.</p>
+    <div class="sec">Stockage</div><div class="card"><div class="meter"><div class="top"><span>Tes données</span><span>${fmtB(t.donnees_octets)}</span></div></div><div class="meter"><div class="top"><span>Photos (${t.photos_nombre})</span><span>${fmtB(t.photos_octets)}</span></div></div><div class="meter"><div class="top"><span>Journal du planificateur</span><span>${fmtB(t.journal_cron_octets)}</span></div><span class="muted small">Vidé chaque nuit à 3 h 23.</span></div></div>`}
+  h+=`<button class="btn" id="rf" style="margin-top:14px">Actualiser</button>`;
+  $("#app").innerHTML=h;bindOut();$("#rf").onclick=()=>loadStats("tribu");
+}
+function meta(j){const p=j.pmin&&j.pmax?(j.pmin===j.pmax?j.pmin:j.pmin+"–"+j.pmax)+" j.":j.pmin?j.pmin+"+ j.":"";return[p,j.dur?j.dur+" min":"",j.age?j.age+" ans+":""].filter(Boolean).join(" · ")}
+function missingPrix(){if(!base)return [];const P={};base.forEach(b=>{if(b.prix)P[b.id]=b.prix});return cat.jeux.filter(j=>!j.prix&&P[j.id]).map(j=>({id:j.id,prix:P[j.id]}))}
+function missingBase(){if(!base)return [];const ids=new Set(cat.jeux.map(j=>j.id)),names=new Set(cat.jeux.map(j=>norm(j.nom)));return base.filter(b=>b.base&&!ids.has(b.id)&&!names.has(norm(b.nom)))}
+function renderList(){
+  const J=cat.jeux,nv=J.filter(j=>j.aVerifier).length,miss=missingBase(),mp=missingPrix();
+  const L=J.filter(j=>(filt==="all"||(filt==="v")===!!j.aVerifier)&&(!q||norm(j.nom+" "+(j.court||"")).includes(norm(q)))).sort((a,b)=>a.nom.localeCompare(b.nom,"fr"));
+  $("#app").innerHTML=`<div class="bar"><h1>Panphilo<span>.</span> Atout</h1><span class="sp"></span><button class="link" id="out">Déconnexion</button></div>${nav()}
+  <p class="muted small" style="margin:0">${J.length} jeux · ${nv} à vérifier · version ${cat.version}${cat.updated?" du "+new Date(cat.updated).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"}):" (catalogue d'origine, jamais modifié)"}</p>
+  ${miss.length?`<div class="card imp"><b>${miss.length} grands classiques à ajouter</b><span class="muted small">${esc(miss.slice(0,6).map(j=>j.nom).join(", "))}${miss.length>6?"…":""}</span><button class="btn pri" id="imp" ${busy?"disabled":""}>Ajouter au catalogue</button></div>`:""}
+  ${mp.length?`<div class="card imp"><b>Prix indicatifs disponibles pour ${mp.length} jeu${mp.length>1?"x":""}</b><span class="muted small">Ils seront préremplis quand un joueur ajoute le jeu. Les prix déjà saisis ne sont pas touchés.</span><button class="btn pri" id="impp" ${busy?"disabled":""}>Compléter les prix</button></div>`:""}
+  <div class="tools"><div class="row"><input id="q" type="search" placeholder="Chercher un jeu" value="${esc(q)}" aria-label="Chercher un jeu"><button class="btn pri" id="new">+ Nouveau</button></div>
+  <div class="seg" role="group" aria-label="Filtre"><button data-f="v" aria-pressed="${filt==="v"}">À vérifier (${nv})</button><button data-f="ok" aria-pressed="${filt==="ok"}">Vérifiées (${J.length-nv})</button><button data-f="all" aria-pressed="${filt==="all"}">Toutes</button></div></div>
+  <div class="list">${L.map(j=>`<button class="it" data-id="${esc(j.id)}"><span><b>${esc(j.nom)}</b><small>${esc([meta(j)||"Infos à compléter",j.points===false?"juste le gagnant":""].filter(Boolean).join(" · "))}</small></span>${j.extension?'<span class="pill e">Extension</span>':""}<span class="pill ${j.aVerifier?"v":"ok"}">${j.aVerifier?"À vérifier":"OK"}</span></button>`).join("")||'<p class="empty">Aucun jeu ne correspond.</p>'}</div>`;
+  $("#q").oninput=e=>{q=e.target.value;const p=e.target.selectionStart;renderList();const i=$("#q");i.focus();i.setSelectionRange(p,p)};
+  document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filt=b.dataset.f;try{localStorage.setItem("atout-admin-f",filt)}catch(e){}renderList()});
+  document.querySelectorAll(".it").forEach(b=>b.onclick=()=>openEdit(b.dataset.id));
+  $("#new").onclick=()=>openEdit(null);
+  const ip=$("#impp");if(ip)ip.onclick=async()=>{const m=missingPrix(),P={};m.forEach(x=>P[x.id]=x.prix);if(await publish(cat.jeux.map(j=>P[j.id]?Object.assign({},j,{prix:P[j.id]}):j),m.length+" prix ajoutés"))renderList()};
+  const im=$("#imp");if(im)im.onclick=async()=>{const m=missingBase();if(await publish(cat.jeux.concat(m.map(x=>{const o=Object.assign({},x);delete o.base;return o})),m.length+" jeux ajoutés au catalogue"))renderList()};
+  $("#out").onclick=()=>{key="";stats={};try{localStorage.removeItem("atout-admin-key")}catch(e){}renderLogin()};
+}
+function openEdit(id){
+  const j=id?cat.jeux.find(x=>x.id===id):null;
+  ed=j?JSON.parse(JSON.stringify(j)):{id:"",nom:"",types:[],rule:"high",points:true,teamN:2,setup:[],aVerifier:false};
+  edId=id;delArm=false;view="edit";renderEdit();window.scrollTo(0,0);
+}
+function sw(k,label){return `<button type="button" class="sw" role="switch" data-sw="${k}" aria-checked="${!!ed[k]}"><span>${label}</span><i></i></button>`}
+function renderEdit(){
+  const e=ed,v=x=>x==null?"":esc(x);
+  $("#app").innerHTML=`<div class="bar"><button class="link" id="back">‹ Liste</button><span class="sp"></span>${edId?`<span class="pill ${e.aVerifier?"v":"ok"}">${e.aVerifier?"À vérifier":"OK"}</span>`:""}</div>
+  <form id="ef" class="card" novalidate>
+   <h2>${edId?esc(e.nom):"Nouveau jeu"}</h2>
+   <div class="f"><label for="nom">Nom</label><input id="nom" value="${v(e.nom)}" maxlength="120" required></div>
+   <div class="f"><label for="court">Nom court dans l'appli</label><input id="court" value="${v(e.court)}" maxlength="24" placeholder="Si le nom dépasse 24 caractères"><span class="hint">24 caractères maximum. Laisser vide si le nom tient déjà.</span></div>
+   <div class="grid4"><div class="f"><label for="pmin">Joueurs min</label><input id="pmin" type="number" inputmode="numeric" value="${v(e.pmin)}"></div><div class="f"><label for="pmax">Joueurs max</label><input id="pmax" type="number" inputmode="numeric" value="${v(e.pmax)}"></div><div class="f"><label for="dur">Durée (min)</label><input id="dur" type="number" inputmode="numeric" value="${v(e.dur)}"></div><div class="f"><label for="age">Âge</label><input id="age" type="number" inputmode="numeric" value="${v(e.age)}"></div></div>
+   <div class="f"><label for="prix">Prix indicatif (€)</label><input id="prix" type="number" inputmode="decimal" step="0.01" min="0" value="${v(e.prix)}" placeholder="Ex. 19,90"><span class="hint">Prérempli quand un joueur ajoute ce jeu à sa ludothèque. Il peut le modifier.</span></div>
+   <div class="f"><span class="lab">Types</span><div class="seg">${TYPES.map(t=>`<button type="button" data-ty="${t}" aria-pressed="${(e.types||[]).includes(t)}">${t}</button>`).join("")}</div></div>
+   <div class="f"><span class="lab">Qui gagne ?</span><div class="seg"><button type="button" data-rule="high" aria-pressed="${e.points&&e.rule!=="low"}">Le plus de points</button><button type="button" data-rule="low" aria-pressed="${e.points&&e.rule==="low"}">Le moins de points</button><button type="button" data-rule="win" aria-pressed="${!e.points}">Juste le gagnant</button></div>${e.points?`<div class="f"><label for="target">Objectif de points (facultatif)</label><input id="target" type="number" inputmode="numeric" value="${v(e.target)}" placeholder="Ex. 200 pour Flip 7"></div>${sw("rounds","Par manches")}`:`<span class="hint">Pas de points à compter : pendant la partie, on touche simplement le gagnant (Codenames, Jungle Speed…).</span>`}</div>
+   <div class="f">${sw("teamMode","En équipes")}${e.teamMode?`<div class="seg">${[2,3,4].map(n=>`<button type="button" data-tn="${n}" aria-pressed="${(e.teamN||2)===n}">${n} équipes</button>`).join("")}</div>`:""}</div>
+   <div class="f"><label for="first">Qui commence</label><input id="first" value="${v(e.first)}" maxlength="200" placeholder="Ex. Le plus jeune"></div>
+   <div class="f"><label for="memo">Règles en bref</label><textarea id="memo" maxlength="2000" placeholder="L'essentiel pour jouer, en quelques phrases.">${v(e.memo)}</textarea></div>
+   <div class="f"><label for="setup">Mise en place</label><textarea id="setup" placeholder="Une étape par ligne">${esc((e.setup||[]).join("\n"))}</textarea><span class="hint">Une étape par ligne. Elles deviennent une checklist dans l'appli.</span></div>
+   ${sw("extension","C'est une extension")}
+   ${sw("aVerifier","Fiche à vérifier")}
+   ${edId?(delArm?`<div class="confirm"><b>Supprimer « ${esc(e.nom)} » du catalogue ?</b><span class="muted small">Les ludothèques des utilisateurs ne sont pas touchées : le jeu disparaît seulement des suggestions.</span><div class="row"><button type="button" class="btn dan" id="delok">Supprimer</button><button type="button" class="btn" id="delno">Annuler</button></div></div>`:`<button type="button" class="link" id="del" style="color:var(--danger);align-self:flex-start">Supprimer ce jeu</button>`):""}
+   <p class="err" id="eerr" hidden></p>
+  </form>
+  <div class="acts"><button class="btn pri" id="save" ${busy?"disabled":""}>${busy?"Publication…":edId?"Enregistrer":"Ajouter au catalogue"}</button>${edId&&e.aVerifier?`<button class="btn" id="saveok" ${busy?"disabled":""}>Valider la fiche</button>`:""}</div>`;
+  const read=()=>{const g=id=>$("#"+id);const n=id=>{const x=g(id);if(!x)return ed[id];const t=x.value.trim();return t===""?null:Math.round(+t)};
+    ed.nom=g("nom").value.trim();ed.court=g("court").value.trim()||null;["pmin","pmax","dur","age","target"].forEach(k=>ed[k]=n(k));
+    {const x=parseFloat(String(g("prix").value).replace(",","."));ed.prix=isNaN(x)||x<=0?null:Math.round(x*100)/100}ed.first=g("first").value.trim();ed.memo=g("memo").value.trim();ed.setup=g("setup").value.split("\n").map(s=>s.trim()).filter(Boolean)};
+  $("#back").onclick=()=>{view="list";renderList()};
+  document.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{read();ed[b.dataset.sw]=!ed[b.dataset.sw];renderEdit()});
+  document.querySelectorAll("[data-ty]").forEach(b=>b.onclick=()=>{read();const t=b.dataset.ty,T=ed.types||[];ed.types=T.includes(t)?T.filter(x=>x!==t):T.concat(t);renderEdit()});
+  document.querySelectorAll("[data-rule]").forEach(b=>b.onclick=()=>{read();const r=b.dataset.rule;if(r==="win"){ed.points=false;ed.target=null;ed.rounds=false}else{ed.points=true;ed.rule=r}renderEdit()});
+  document.querySelectorAll("[data-tn]").forEach(b=>b.onclick=()=>{read();ed.teamN=+b.dataset.tn;renderEdit()});
+  const d=$("#del");if(d)d.onclick=()=>{read();delArm=true;renderEdit()};
+  const dn=$("#delno");if(dn)dn.onclick=()=>{delArm=false;renderEdit()};
+  const dk=$("#delok");if(dk)dk.onclick=async()=>{const name=ed.nom;if(await publish(cat.jeux.filter(x=>x.id!==edId),name+" supprimé")){view="list";renderList()}};
+  const err=m=>{const p=$("#eerr");p.textContent=m;p.hidden=false;p.scrollIntoView({block:"center"})};
+  const save=async(markOk)=>{read();if(!ed.nom)return err("Donne un nom au jeu.");if(ed.court&&ed.court.length>24)return err("Le nom court doit faire 24 caractères maximum.");
+    if(!ed.court&&ed.nom.length>24)return err("Le nom dépasse 24 caractères : ajoute un nom court pour l'appli.");
+    if(ed.pmin&&ed.pmax&&ed.pmin>ed.pmax)return err("Le nombre de joueurs min dépasse le max.");
+    if(markOk)ed.aVerifier=false;
+    let jeux;if(edId){jeux=cat.jeux.map(x=>x.id===edId?ed:x)}else{let id=slug(ed.nom),i=2;while(cat.jeux.some(x=>x.id===id))id=slug(ed.nom)+"-"+i++;ed.id=id;
+      if(cat.jeux.some(x=>norm(x.nom)===norm(ed.nom)))return err("Un jeu porte déjà ce nom dans le catalogue.");jeux=cat.jeux.concat(ed)}
+    if(await publish(jeux,edId?"Publié : "+ed.nom:ed.nom+" ajouté au catalogue")){edId=ed.id;view="list";renderList()}};
+  $("#save").onclick=()=>save(false);const so=$("#saveok");if(so)so.onclick=()=>save(true);
+  $("#ef").onsubmit=e=>{e.preventDefault();save(false)};
+}
+key?api("/api/catalog/admin",{action:"check"}).then(load).catch(e=>renderLogin(e.status===401?"":e.message)):renderLogin();
+</script>
+</body>
+</html>
