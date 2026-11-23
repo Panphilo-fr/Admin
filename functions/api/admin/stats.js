@@ -76,11 +76,14 @@ async function cloudflareStats(env) {
     const out = {};
     for (const p of PAGES_PROJECTS) {
       let n = 0;
-      for (let page = 1; page <= 3; page++) {
-        const d = await cfApi(env, `/accounts/${accountTag}/pages/projects/${p}/deployments?per_page=50&page=${page}`);
+      for (let page = 1; page <= 10; page++) {
+        // Cloudflare refuse certaines tailles de page : on essaie sans, puis avec 25.
+        let d;
+        try { d = await cfApi(env, `/accounts/${accountTag}/pages/projects/${p}/deployments?page=${page}`); }
+        catch { d = await cfApi(env, `/accounts/${accountTag}/pages/projects/${p}/deployments?page=${page}&per_page=25`); }
         const items = d.result ?? [];
         n += items.filter(x => String(x.created_on ?? "").slice(0, 10) >= debutMois).length;
-        if (items.length < 50 || String(items[items.length - 1]?.created_on ?? "").slice(0, 10) < debutMois) break;
+        if (!items.length || String(items[items.length - 1]?.created_on ?? "").slice(0, 10) < debutMois) break;
       }
       out[p] = n;
     }
